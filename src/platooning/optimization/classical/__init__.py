@@ -1,0 +1,1 @@
+"""Classical optimization sub-package."""

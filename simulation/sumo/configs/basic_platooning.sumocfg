@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Basic Platooning SUMO Configuration
+  ====================================
+  Ties together the network and routes for the initial platooning scenario.
+
+  NOTE: step-length may be overridden by the Python application via TraCI
+  command-line arguments (using the value from config/config.yaml).
+-->
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="../networks/basic_platooning.net.xml"/>
+        <route-files value="../routes/basic_platooning.rou.xml"/>
+    </input>
+
+    <time>
+        <begin value="0"/>
+        <end value="120"/>
+        <step-length value="0.1"/>
+    </time>
+
+    <processing>
+        <seed value="42"/>
+    </processing>
+
+    <report>
+        <verbose value="false"/>
+        <no-step-log value="true"/>
+    </report>
+
+</configuration>

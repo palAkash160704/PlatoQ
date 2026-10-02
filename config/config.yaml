@@ -1,0 +1,35 @@
+# ==============================================================================
+# Hybrid Quantum-Classical Vehicle Platooning — Default Configuration
+# ==============================================================================
+# These are DEFAULT DEVELOPMENT PARAMETERS only.
+# They have NOT been experimentally validated and MUST be tuned per scenario.
+# All values are configurable and can be overridden per experiment.
+# ==============================================================================
+
+simulation:
+  simulator: sumo                # Traffic simulator backend (sumo)
+  config_file: simulation/sumo/configs/basic_platooning.sumocfg  # Relative to repo root
+  step_length: 0.1               # Simulation time-step in seconds
+  end_time: 60                   # Simulation end time in seconds
+  gui: false                     # true = sumo-gui, false = headless sumo
+  seed: 42                       # Random seed for reproducibility
+  log_interval: 50               # Log vehicle states every N steps (0 = never)
+
+communication:
+  range_meters: 100               # Maximum V2V communication range (metres)
+  latency_ms: 50                  # Simulated one-way message latency (ms)
+  packet_loss_rate: 0.0           # Probability of packet loss [0.0, 1.0]
+  message_frequency_hz: 10        # V2V broadcast frequency (Hz)
+
+platooning:
+  minimum_platoon_size: 2         # Minimum vehicles to form a platoon
+  maximum_platoon_size: 10        # Maximum vehicles in a single platoon
+  desired_time_headway: 1.5       # Target time headway in seconds
+  minimum_gap: 5.0                # Minimum inter-vehicle gap in metres
+
+optimization:
+  method: classical               # Optimisation backend (classical | qubo | quantum)
+  random_seed: 42                 # Seed for optimizer randomness
+
+logging:
+  level: INFO                     # Log level (DEBUG | INFO | WARNING | ERROR)

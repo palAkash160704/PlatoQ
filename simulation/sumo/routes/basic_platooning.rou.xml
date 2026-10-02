@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Basic Platooning Routes
+  =======================
+  Five connected/cooperative vehicles on a single straight road.
+
+  Vehicle type: coop_vehicle
+    - length:  5.0 m     (standard passenger car)
+    - maxSpeed: 33.33 m/s (~120 km/h)
+    - accel:    2.6 m/s²  (typical passenger car acceleration)
+    - decel:    4.5 m/s²  (typical comfortable deceleration)
+    - sigma:    0.0       (no randomness — deterministic for research)
+    - tau:      1.0 s     (driver reaction / headway time)
+    - carFollowModel: Krauss (default SUMO model)
+
+  Vehicles are staggered by 2 s intervals with controlled initial
+  spacing so that we can study vehicle-following behaviour.
+
+  NOTE: These are simulation assumptions, NOT experimentally validated
+  real-world values.  They must be tuned per experiment scenario.
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+
+    <!-- Connected / cooperative vehicle type -->
+    <vType id="coop_vehicle"
+           length="5.0"
+           maxSpeed="33.33"
+           accel="2.6"
+           decel="4.5"
+           sigma="0.0"
+           tau="1.0"
+           color="0,128,255"
+           carFollowModel="Krauss"/>
+
+    <!-- Shared route: all vehicles travel the full main road -->
+    <route id="main_route" edges="main_road"/>
+
+    <!-- Vehicles with staggered departure times -->
+    <vehicle id="V1" type="coop_vehicle" route="main_route"
+             depart="0.0" departLane="0" departSpeed="0"/>
+
+    <vehicle id="V2" type="coop_vehicle" route="main_route"
+             depart="2.0" departLane="0" departSpeed="0"/>
+
+    <vehicle id="V3" type="coop_vehicle" route="main_route"
+             depart="4.0" departLane="0" departSpeed="0"/>
+
+    <vehicle id="V4" type="coop_vehicle" route="main_route"
+             depart="6.0" departLane="0" departSpeed="0"/>
+
+    <vehicle id="V5" type="coop_vehicle" route="main_route"
+             depart="8.0" departLane="0" departSpeed="0"/>
+
+</routes>

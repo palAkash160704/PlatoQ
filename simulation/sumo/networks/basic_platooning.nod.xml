@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Node definitions for the basic platooning network.
+  Two nodes: start (x=0) and end (x=2000).
+-->
+<nodes>
+    <node id="start" x="0.0" y="0.0" type="dead_end"/>
+    <node id="end"   x="2000.0" y="0.0" type="dead_end"/>
+</nodes>

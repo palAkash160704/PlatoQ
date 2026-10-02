@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Edge definitions for the basic platooning network.
+  One edge: main_road from start to end, 2 lanes, ~120 km/h.
+-->
+<edges>
+    <edge id="main_road" from="start" to="end" numLanes="2" speed="33.33"/>
+</edges>

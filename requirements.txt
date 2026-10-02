@@ -1,0 +1,24 @@
+# ==============================================================================
+# Core dependencies — Phase 0
+# ==============================================================================
+numpy>=1.26
+scipy>=1.11
+pandas>=2.1
+pyyaml>=6.0
+python-dotenv>=1.0
+
+# ==============================================================================
+# SUMO / TraCI
+# ==============================================================================
+# TraCI is bundled with the SUMO installation.
+# Install SUMO following: https://sumo.dlr.de/docs/Installing/index.html
+# Then set the SUMO_HOME environment variable to the SUMO installation root.
+# TraCI Python bindings are located at $SUMO_HOME/tools and must be on PYTHONPATH.
+# Alternatively, install the `traci` PyPI package:
+#   pip install traci sumolib
+
+# ==============================================================================
+# Quantum / QAOA — NOT required in Phase 0
+# ==============================================================================
+# Qiskit and related quantum packages will be introduced in a later phase.
+# Do NOT install them now to keep the environment lightweight.
