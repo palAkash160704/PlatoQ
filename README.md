@@ -96,7 +96,7 @@ The classical and hybrid quantum-classical approaches will eventually be compare
 |---|---|---|
 | **Phase 0** | Project setup & software architecture | ✅ Complete |
 | **Phase 1** | SUMO simulation & TraCI integration | ✅ Complete |
-| Phase 2 | V2V communication simulation | 🔲 Planned |
+| **Phase 2** | V2V communication simulation | ✅ Complete |
 | Phase 3 | Platoon management & formation | 🔲 Planned |
 | Phase 4 | Classical optimization | 🔲 Planned |
 | Phase 5 | QUBO formulation | 🔲 Planned |
@@ -155,6 +155,28 @@ Vehicle states are extracted from SUMO into `VehicleState` objects.
   V3   | x=  296.42 | y= -4.80 | speed=33.33 | accel= +0.00 | lane=main_road_0
   V4   | x=  213.68 | y= -4.80 | speed=29.37 | accel= +0.00 | lane=main_road_0
   V5   | x=  144.36 | y= -4.80 | speed=26.78 | accel= +2.60 | lane=main_road_0
+```
+
+---
+
+## Phase 2 — V2V Communication
+
+Phase 2 introduces a simulated Vehicle-to-Vehicle (V2V) communication layer.
+
+- **Information Only:** Vehicles exchange state information (position, speed, etc.). They do not change their physical behaviour based on these messages yet.
+- **Communication Range:** Only vehicles within `range_meters` can communicate.
+- **Latency:** Configurable simulated transmission delay (`latency_ms`).
+- **Packet Loss:** Probabilistic message dropping (`packet_loss_rate`).
+- **Message Frequency:** Configurable broadcast rate (e.g. 10 Hz).
+- **Stale Data:** Messages exceeding `stale_threshold_ms` are flagged.
+- **Statistics:** Real-time tracking of sent, delivered, dropped, and stale messages.
+
+**Example output:**
+```
+[SIM] t=40.0s | vehicles=5
+...
+[V2V] sent=2810 | delivered=2804 | dropped=0
+[V2V] delivery_rate=99.8% | avg_latency=100.0ms | stale=12
 ```
 
 ---

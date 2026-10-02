@@ -50,6 +50,7 @@ This document defines what is **included** and what is **not included** in the i
 
 - A software-simulated V2V network with configurable range, latency, and packet loss.
 - Communication affects platoon management decisions (e.g. a vehicle that cannot communicate is ineligible for platooning).
+- **Phase 2 status:** Simulated V2V communication is fully operational. Vehicles broadcast state, apply Euclidean range checks, simulate configurable message latency and probabilistic packet loss, flag stale messages, and collect network statistics. Phase 2 establishes V2V information exchange only — no platoon formation or optimization is implemented yet.
 
 ---
 

@@ -20,6 +20,7 @@ communication:
   latency_ms: 50                  # Simulated one-way message latency (ms)
   packet_loss_rate: 0.0           # Probability of packet loss [0.0, 1.0]
   message_frequency_hz: 10        # V2V broadcast frequency (Hz)
+  stale_threshold_ms: 200         # Messages older than this are stale (ms)
 
 platooning:
   minimum_platoon_size: 2         # Minimum vehicles to form a platoon

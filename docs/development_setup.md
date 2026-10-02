@@ -192,7 +192,7 @@ python -m platooning.main
 python -m platooning.main --gui
 ```
 
-Expected output (Phase 1):
+Expected output (Phase 2):
 
 ```
 ==================================================
@@ -201,18 +201,45 @@ v0.1.0
 ==================================================
 
 <timestamp> | INFO | Configuration loaded successfully.
-<timestamp> | INFO | Configuration validated — no errors.
-<timestamp> | INFO | Simulation backend: SUMO
 <timestamp> | INFO | Starting SUMO simulation...
-<timestamp> | INFO | Starting SUMO with command: ...
-<timestamp> | INFO | TraCI connection established.
+<timestamp> | INFO | V2V: range=100m  latency=50ms  loss=0.0%  freq=10Hz  stale=200ms
 <timestamp> | INFO | SUMO simulation started (gui=False).
-<timestamp> | INFO | [SIM] t=5.0s | vehicles=3
-<timestamp> | INFO |   V1   | x=  ... | y= ... | speed=... | accel=... | lane=main_road_0
+<timestamp> | INFO | [SIM] t=40.0s | vehicles=5
+<timestamp> | INFO |   V1   | x= 1075.68 | speed=31.61 | accel= +0.00 | lane=main_road_0
 ...
-<timestamp> | INFO | Simulation completed. Total steps: 809 | Final time: 80.9s
-<timestamp> | INFO | TraCI connection closed.
-<timestamp> | INFO | SUMO simulation stopped after 809 steps.
+<timestamp> | INFO | [V2V] sent=2810 | delivered=2804 | dropped=0
+<timestamp> | INFO | [V2V] delivery_rate=99.8% | avg_latency=100.0ms | stale=12
+...
+<timestamp> | INFO | Simulation completed. Total steps: 821 | Final time: 82.1s
+<timestamp> | INFO | [V2V FINAL] sent=5256 delivered=5256 dropped=0 delivery_rate=100.0% avg_latency=100.0ms
+```
+
+### Changing V2V Parameters
+
+Edit `config/config.yaml` to switch experimental modes:
+
+**Ideal:**
+```yaml
+communication:
+  range_meters: 100
+  latency_ms: 0
+  packet_loss_rate: 0.0
+```
+
+**Realistic Baseline:**
+```yaml
+communication:
+  range_meters: 100
+  latency_ms: 50
+  packet_loss_rate: 0.05
+```
+
+**Degraded:**
+```yaml
+communication:
+  range_meters: 100
+  latency_ms: 200
+  packet_loss_rate: 0.20
 ```
 
 ---

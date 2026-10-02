@@ -4,6 +4,7 @@ import pytest
 
 from platooning.communication.v2v import V2VNetwork
 from platooning.models.communication import CommunicationMessage, MessageType
+from platooning.models.vehicle import VehicleState
 from platooning.optimization.classical.optimizer import (
     BaseOptimizer,
     ClassicalOptimizer,
@@ -54,16 +55,17 @@ class TestCommunicationMessage:
             "platoon_update",
             "emergency",
             "state_broadcast",
+            "vehicle_state",
         }
         actual = {mt.value for mt in MessageType}
         assert expected == actual
 
 
 # ======================================================================
-# V2VNetwork
+# V2VNetwork (Phase 2 Simulation Model)
 # ======================================================================
 class TestV2VNetwork:
-    """Verify basic V2VNetwork send/receive behaviour."""
+    """Verify V2VNetwork simulated network behaviour."""
 
     @pytest.fixture()
     def network(self) -> V2VNetwork:
@@ -73,9 +75,113 @@ class TestV2VNetwork:
                 "latency_ms": 50,
                 "packet_loss_rate": 0.0,
                 "message_frequency_hz": 10,
-            }
+                "stale_threshold_ms": 200,
+            },
+            seed=42,
         )
 
+    @pytest.fixture()
+    def v1(self) -> VehicleState:
+        return VehicleState("v1", 10.0, 0.0, 0.0, speed=20)
+
+    @pytest.fixture()
+    def v2_in_range(self) -> VehicleState:
+        return VehicleState("v2", 10.0, 80.0, 0.0, speed=20)
+
+    @pytest.fixture()
+    def v3_out_of_range(self) -> VehicleState:
+        return VehicleState("v3", 10.0, 150.0, 0.0, speed=20)
+
+    # --- Neighbour Discovery & Range ---
+    def test_neighbours_within_range(
+        self, network: V2VNetwork, v1, v2_in_range, v3_out_of_range
+    ) -> None:
+        neighbors = network.get_neighbors(
+            v1.vehicle_id, [v1, v2_in_range, v3_out_of_range]
+        )
+        assert len(neighbors) == 1
+        assert neighbors[0].vehicle_id == "v2"
+
+    def test_sender_not_own_neighbour(self, network: V2VNetwork, v1) -> None:
+        neighbors = network.get_neighbors(v1.vehicle_id, [v1])
+        assert len(neighbors) == 0
+
+    # --- Broadcasting ---
+    def test_broadcast_generates_messages(
+        self, network: V2VNetwork, v1, v2_in_range
+    ) -> None:
+        scheduled = network.broadcast(v1, [v1, v2_in_range], 10.0)
+        assert scheduled == 1
+        assert network.pending_count == 1
+
+    def test_frequency_gating(self, network: V2VNetwork, v1, v2_in_range) -> None:
+        # At 10Hz, broadcast interval is 0.1s
+        network.broadcast(v1, [v1, v2_in_range], 10.0)
+        # 10.05s is too soon
+        scheduled = network.broadcast(v1, [v1, v2_in_range], 10.05)
+        assert scheduled == 0
+        # 10.1s is exactly on time
+        scheduled = network.broadcast(v1, [v1, v2_in_range], 10.1)
+        assert scheduled == 1
+
+    # --- Latency & Delivery ---
+    def test_latency_delay(self, network: V2VNetwork, v1, v2_in_range) -> None:
+        # 50ms latency -> delivery time 10.05
+        network.broadcast(v1, [v1, v2_in_range], 10.0)
+
+        # At 10.0, not delivered
+        delivered = network.deliver(10.0)
+        assert len(delivered) == 0
+        assert network.pending_count == 1
+
+        # At 10.05, delivered
+        delivered = network.deliver(10.05)
+        assert len(delivered) == 1
+        assert network.pending_count == 0
+        assert delivered[0].receiver_id == "v2"
+
+    # --- Packet Loss ---
+    def test_packet_loss_drops_messages(self, v1, v2_in_range) -> None:
+        net = V2VNetwork({"packet_loss_rate": 1.0, "message_frequency_hz": 10}, seed=42)
+        scheduled = net.broadcast(v1, [v1, v2_in_range], 10.0)
+        assert scheduled == 0
+        assert net.pending_count == 0
+        stats = net.get_statistics()
+        assert stats.messages_sent == 1
+        assert stats.messages_dropped == 1
+
+    # --- Message Age & Latest State ---
+    def test_latest_state_and_age(self, network: V2VNetwork, v1, v2_in_range) -> None:
+        network.broadcast(v1, [v1, v2_in_range], 10.0)
+        network.deliver(10.05)
+
+        latest = network.get_latest_state("v2", "v1")
+        assert latest is not None
+        assert latest.timestamp == 10.0
+
+        # At t=10.05, age = 0.05
+        age = network.get_message_age(latest, 10.05)
+        assert age == pytest.approx(0.05)
+
+        # Threshold is 200ms
+        assert not network.is_stale(latest, 10.05)
+        assert network.is_stale(latest, 10.25)
+
+    # --- Statistics ---
+    def test_statistics(
+        self, network: V2VNetwork, v1, v2_in_range, v3_out_of_range
+    ) -> None:
+        network.broadcast(v1, [v1, v2_in_range, v3_out_of_range], 10.0)
+        network.deliver(10.05)
+        stats = network.get_statistics()
+
+        assert stats.messages_sent == 1
+        assert stats.messages_delivered == 1
+        assert stats.messages_out_of_range == 1
+        assert stats.delivery_rate == 1.0
+        assert stats.average_latency_ms == pytest.approx(50.0)
+
+    # --- Legacy Phase 0 API tests ---
     def test_send_and_receive(self, network: V2VNetwork) -> None:
         msg = CommunicationMessage(sender_id="v1", receiver_id="v2")
         network.send(msg)

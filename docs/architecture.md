@@ -117,34 +117,32 @@ All inter-layer data is exchanged as Python dataclasses (`VehicleState`, `Platoo
 
 ---
 
-## Phase 1 — Operational Data Flow
+## Phase 2 — Operational Data Flow
 
-The following pipeline is **fully implemented and tested** as of Phase 1:
+The following pipeline is **fully implemented and tested** as of Phase 2:
 
-```
+```text
 SUMO (eclipse-sumo 1.27.1)
-  │  basic_platooning.sumocfg
-  │  5 vehicles (V1–V5), coop_vehicle type
   │
   ▼
 TraCIManager
-  │  traci.start() / traci.simulationStep()
-  │  traci.vehicle.getPosition / getSpeed / getAcceleration / ...
   │
   ▼
 SUMOSimulator
-  │  start() → step() → get_vehicle_states() → stop()
-  │  Lifecycle: START → CONNECTED → RUNNING → STOPPING → DISCONNECTED
   │
   ▼
-VehicleState (dataclass)
-  │  vehicle_id, timestamp, position_x, position_y,
-  │  speed, acceleration, lane_id, route_id, vehicle_type
+VehicleState
+  │
+  ▼
+V2VNetwork
+  │   └── NetworkModel (range, latency, packet loss, freq)
+  ▼
+Neighbour State (Latest Known VehicleState) + Communication Statistics
   │
   ▼
 Application Logger (compact periodic output)
 ```
 
-Steps 4–9 (V2V, PlatoonManager, Optimizer, Controller) remain as stubs
+Steps 5-9 (PlatoonManager, Optimizer, Controller) remain as stubs
 and will be connected in subsequent phases.
 

@@ -1,8 +1,9 @@
 """
 Application entry point for the Hybrid Quantum-Classical Vehicle Platooning system.
 
-Phase 1 — runs the SUMO simulation, extracts vehicle states via TraCI,
-and logs a compact summary.
+Phase 2 — runs the SUMO simulation, extracts vehicle states via TraCI,
+broadcasts V2V messages, and logs compact summaries of both simulation
+and communication activity.
 
 Usage::
 
@@ -19,6 +20,8 @@ import argparse
 import sys
 
 from platooning import __version__
+from platooning.communication.network_model import NetworkModel
+from platooning.communication.v2v import V2VNetwork
 from platooning.config.settings import load_config, validate_config
 from platooning.simulation.simulator import SUMOSimulator
 from platooning.utils.logger import get_logger, setup_logging
@@ -61,7 +64,7 @@ def _format_vehicle_line(state) -> str:  # noqa: ANN001
 
 
 def run_simulation(config: dict, gui: bool = False) -> None:
-    """Run the SUMO simulation loop and log vehicle states.
+    """Run the SUMO simulation loop with V2V communication.
 
     Parameters
     ----------
@@ -86,7 +89,21 @@ def run_simulation(config: dict, gui: bool = False) -> None:
         )
         return
 
+    # --- V2V setup --------------------------------------------------------
+    comm_config = config.get("communication", {})
+    seed = config.get("simulation", {}).get("seed", 42)
+    network_model = NetworkModel.from_config(comm_config)
+    v2v = V2VNetwork(comm_config, seed=seed, network_model=network_model)
+
     logger.info("Starting SUMO simulation...")
+    logger.info(
+        "V2V: range=%dm  latency=%dms  loss=%.1f%%  freq=%dHz  stale=%dms",
+        int(network_model.range_meters),
+        int(network_model.base_latency_ms),
+        network_model.packet_loss_rate * 100,
+        int(network_model.message_frequency_hz),
+        int(network_model.stale_threshold_ms),
+    )
 
     try:
         simulator.start()
@@ -94,21 +111,56 @@ def run_simulation(config: dict, gui: bool = False) -> None:
         log_interval = simulator.log_interval
         while simulator.has_vehicles_pending():
             simulator.step()
+            sim_time = simulator.simulation_time
 
-            # Periodic compact logging
+            # --- V2V communication ---
+            states = simulator.get_vehicle_states()
+
+            # Each vehicle broadcasts its state
+            for state in states:
+                v2v.broadcast(state, states, sim_time)
+
+            # Deliver messages whose delivery_time has arrived
+            v2v.deliver(sim_time)
+
+            # --- Periodic logging ---
             if log_interval > 0 and simulator.step_count % log_interval == 0:
-                states = simulator.get_vehicle_states()
-                sim_t = simulator.simulation_time
-                logger.info("[SIM] t=%.1fs | vehicles=%d", sim_t, len(states))
+                logger.info("[SIM] t=%.1fs | vehicles=%d", sim_time, len(states))
                 for s in states:
                     logger.info(_format_vehicle_line(s))
 
-        # Final state snapshot
-        states = simulator.get_vehicle_states()
+                # V2V statistics
+                stats = v2v.get_statistics()
+                stale_count = v2v.count_stale_states(sim_time)
+                if stats.messages_sent > 0:
+                    logger.info(
+                        "[V2V] sent=%d | delivered=%d | dropped=%d",
+                        stats.messages_sent,
+                        stats.messages_delivered,
+                        stats.messages_dropped,
+                    )
+                    logger.info(
+                        "[V2V] delivery_rate=%.1f%% | avg_latency=%.1fms | stale=%d",
+                        stats.delivery_rate * 100,
+                        stats.average_latency_ms,
+                        stale_count,
+                    )
+
+        # Final statistics
+        stats = v2v.get_statistics()
         logger.info(
             "Simulation completed. Total steps: %d | Final time: %.1fs",
             simulator.step_count,
             simulator.simulation_time,
+        )
+        logger.info(
+            "[V2V FINAL] sent=%d delivered=%d dropped=%d "
+            "delivery_rate=%.1f%% avg_latency=%.1fms",
+            stats.messages_sent,
+            stats.messages_delivered,
+            stats.messages_dropped,
+            stats.delivery_rate * 100,
+            stats.average_latency_ms,
         )
 
     except FileNotFoundError as exc:
