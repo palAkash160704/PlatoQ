@@ -22,7 +22,10 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
 
-    <!-- Connected / cooperative vehicle type -->
+    <!-- Connected / cooperative vehicle type
+         Lane-change motivations are zeroed out so vehicles remain on
+         their departure lane during the baseline simulation.  Future
+         phases may re-enable lane-changing or issue explicit commands. -->
     <vType id="coop_vehicle"
            length="5.0"
            maxSpeed="33.33"
@@ -31,7 +34,12 @@
            sigma="0.0"
            tau="1.0"
            color="0,128,255"
-           carFollowModel="Krauss"/>
+           carFollowModel="Krauss"
+           laneChangeModel="LC2013"
+           lcStrategic="0.0"
+           lcCooperative="0.0"
+           lcSpeedGain="0.0"
+           lcKeepRight="0.0"/>
 
     <!-- Shared route: all vehicles travel the full main road -->
     <route id="main_route" edges="main_road"/>
