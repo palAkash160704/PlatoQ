@@ -18,6 +18,11 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
+
+# Ensure the 'src' directory is at the front of sys.path
+# so 'platooning' resolves to the top-level package instead of the sub-package.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from platooning import __version__
 from platooning.communication.network_model import NetworkModel
