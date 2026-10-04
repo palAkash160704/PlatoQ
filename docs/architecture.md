@@ -117,9 +117,9 @@ All inter-layer data is exchanged as Python dataclasses (`VehicleState`, `Platoo
 
 ---
 
-## Phase 2 — Operational Data Flow
+## Phase 3 — Operational Data Flow
 
-The following pipeline is **fully implemented and tested** as of Phase 2:
+The following pipeline is **fully implemented and tested** as of Phase 3:
 
 ```text
 SUMO (eclipse-sumo 1.27.1)
@@ -137,12 +137,18 @@ VehicleState
 V2VNetwork
   │   └── NetworkModel (range, latency, packet loss, freq)
   ▼
-Neighbour State (Latest Known VehicleState) + Communication Statistics
+Neighbour State (Latest Known VehicleState)
+  │
+  ▼
+PlatoonManager
+  │   └── Compatibility Evaluation (distance, speed, route, lane, staleness)
+  │   └── Deterministic Classical Formation Algorithm
+  ▼
+Platoon Configuration + Formation Metrics
   │
   ▼
 Application Logger (compact periodic output)
 ```
 
-Steps 5-9 (PlatoonManager, Optimizer, Controller) remain as stubs
-and will be connected in subsequent phases.
+Steps 6, 8, 9 (Optimizer, Controller) remain as stubs and will be connected in subsequent phases.
 

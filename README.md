@@ -97,13 +97,12 @@ The classical and hybrid quantum-classical approaches will eventually be compare
 | **Phase 0** | Project setup & software architecture | ✅ Complete |
 | **Phase 1** | SUMO simulation & TraCI integration | ✅ Complete |
 | **Phase 2** | V2V communication simulation | ✅ Complete |
-| Phase 3 | Platoon management & formation | 🔲 Planned |
-| Phase 4 | Classical optimization | 🔲 Planned |
-| Phase 5 | QUBO formulation | 🔲 Planned |
-| Phase 6 | Quantum / hybrid optimization (QAOA) | 🔲 Planned |
-| Phase 7 | Cooperative control (CACC) | 🔲 Planned |
-| Phase 8 | Experiments & evaluation | 🔲 Planned |
-| Phase 9 | Visualization & dashboard | 🔲 Planned |
+| **Phase 3** | Platoon management & formation | ✅ Complete |
+| **Phase 4** | QUBO formulation & exact solver | ✅ Complete |
+| **Phase 5** | Quantum / hybrid optimization (QAOA) | ✅ Complete |
+| Phase 6 | Cooperative control (CACC) | 🔲 Planned |
+| Phase 7 | Experiments & evaluation | 🔲 Planned |
+| Phase 8 | Visualization & dashboard | 🔲 Planned |
 
 ---
 

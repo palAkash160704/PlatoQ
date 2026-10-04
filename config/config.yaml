@@ -23,14 +23,44 @@ communication:
   stale_threshold_ms: 200         # Messages older than this are stale (ms)
 
 platooning:
+  enabled: true
+  formation_interval_ms: 500      # Recompute platoon formation every 500ms
+  max_formation_distance_m: 50.0  # Max distance for vehicles to platoon (m)
+  max_speed_difference_mps: 3.0   # Max speed diff for vehicles to platoon (m/s)
   minimum_platoon_size: 2         # Minimum vehicles to form a platoon
-  maximum_platoon_size: 10        # Maximum vehicles in a single platoon
-  desired_time_headway: 1.5       # Target time headway in seconds
-  minimum_gap: 5.0                # Minimum inter-vehicle gap in metres
+  maximum_platoon_size: 5         # Maximum vehicles in a single platoon
+  
+  # Objective function weights for Phase 3 classical baseline
+  weight_membership: 10.0         # Benefit for each vehicle grouped in a platoon
+  weight_distance_penalty: 0.5    # Penalty multiplier per meter of intra-platoon distance
+  weight_speed_penalty: 1.0       # Penalty multiplier per m/s difference from leader speed
+  weight_ungrouped_penalty: 5.0   # Penalty for each unassigned vehicle
+
+qubo:
+  enabled: true
+  solver: exact                   # Phase 4 exact enumeration
+  max_exact_variables: 25         # Prevent simulation freezing on large N
+  weight_pairwise_distance: 0.1   # Adapted QUBO weight (pairwise distance)
+  weight_pairwise_speed: 0.5      # Adapted QUBO weight (pairwise speed difference)
+  penalty_assignment: 1000.0      # Enforce exactly one platoon per vehicle max
+  penalty_incompatibility: 1000.0 # Enforce incompatible vehicles don't mix
+  penalty_size: 1000.0            # Enforce platoon size limits
 
 optimization:
   method: classical               # Optimisation backend (classical | qubo | quantum)
   random_seed: 42                 # Seed for optimizer randomness
 
+quantum:
+  backend: "aer_simulator"         # Quantum backend (aer_simulator only for Phase 5)
+  shots: 1024                      # Number of measurement shots
+  reps: 1                          # QAOA circuit depth (p)
+  optimizer: "COBYLA"              # Classical optimizer for QAOA parameters
+  seed: 42                         # Random seed for reproducibility
+
 logging:
   level: INFO                     # Log level (DEBUG | INFO | WARNING | ERROR)
+
+dynamic:
+  reconfiguration_interval_ms: 2000 # Evaluate reconfiguration at most every 2000ms
+  reconfiguration_cooldown_ms: 2000 # Prevents thrashing by blocking immediate reconfiguration
+  minimum_improvement: 0.5          # Minimum objective improvement required for periodic reconfiguration

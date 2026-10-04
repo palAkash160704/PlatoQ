@@ -23,6 +23,7 @@ from platooning import __version__
 from platooning.communication.network_model import NetworkModel
 from platooning.communication.v2v import V2VNetwork
 from platooning.config.settings import load_config, validate_config
+from platooning.platooning.dynamic_manager import DynamicPlatoonManager
 from platooning.simulation.simulator import SUMOSimulator
 from platooning.utils.logger import get_logger, setup_logging
 
@@ -105,6 +106,10 @@ def run_simulation(config: dict, gui: bool = False) -> None:
         int(network_model.stale_threshold_ms),
     )
 
+    # --- Platoon Manager setup --------------------------------------------
+    opt_method = config.get("optimization", {}).get("method", "classical")
+    pm = DynamicPlatoonManager(config, optimizer_mode=opt_method)
+
     try:
         simulator.start()
 
@@ -122,6 +127,13 @@ def run_simulation(config: dict, gui: bool = False) -> None:
 
             # Deliver messages whose delivery_time has arrived
             v2v.deliver(sim_time)
+
+            # --- Platoon Management ---
+            # All receivers combined perspective
+            latest_known = {
+                s.vehicle_id: v2v.get_all_known_states(s.vehicle_id) for s in states
+            }
+            pm.update_vehicle_states(latest_known, sim_time)
 
             # --- Periodic logging ---
             if log_interval > 0 and simulator.step_count % log_interval == 0:

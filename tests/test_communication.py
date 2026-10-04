@@ -234,15 +234,15 @@ class TestOptimizerInterfaces:
         with pytest.raises(NotImplementedError):
             opt.optimize([])
 
-    def test_qubo_optimize_not_implemented(self) -> None:
+    def test_qubo_optimize_implemented(self) -> None:
         opt = QUBOOptimizer()
-        with pytest.raises(NotImplementedError):
-            opt.optimize([])
+        result = opt.optimize([])
+        assert "platoons" in result
 
-    def test_quantum_optimize_not_implemented(self) -> None:
+    def test_quantum_optimize_implemented(self) -> None:
         opt = QuantumOptimizer()
-        with pytest.raises(NotImplementedError):
-            opt.optimize([])
+        result = opt.optimize([])
+        assert "platoons" in result
 
 
 # ======================================================================

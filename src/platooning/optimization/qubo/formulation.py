@@ -34,20 +34,27 @@ class QUBOOptimizer(BaseOptimizer):
         self._solution: Any = None
 
     def optimize(self, vehicle_states: list[VehicleState], **kwargs: Any) -> Any:
-        """Formulate and solve the QUBO.
+        """Formulate and solve the QUBO using the exact solver."""
+        from platooning.optimization.qubo_builder import (
+            build_qubo,
+            solve_qubo_exact,
+            decode_solution
+        )
+        import time
 
-        .. todo:: Phase 5
-        """
-        # TODO — Phase 5
-        raise NotImplementedError("QUBOOptimizer.optimize() not yet implemented.")
+        q_matrix, num_vars = build_qubo(vehicle_states, self._config, time.time())
+        if num_vars == 0:
+            self._solution = {"platoons": []}
+            return self._solution
+
+        sol, energy = solve_qubo_exact(q_matrix, num_vars)
+        platoons = decode_solution(sol, vehicle_states, self._config)
+        self._solution = {"platoons": platoons, "energy": energy}
+        return self._solution
 
     def evaluate(self, solution: Any) -> dict[str, float]:
-        """Evaluate a QUBO solution.
-
-        .. todo:: Phase 5
-        """
-        # TODO — Phase 5
-        raise NotImplementedError("QUBOOptimizer.evaluate() not yet implemented.")
+        """Evaluate a QUBO solution."""
+        return {"energy": solution.get("energy", 0.0)}
 
     def get_solution(self) -> Any:
         """Return the last computed QUBO solution."""

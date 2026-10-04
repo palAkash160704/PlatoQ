@@ -18,7 +18,7 @@ python-dotenv>=1.0
 #   pip install traci sumolib
 
 # ==============================================================================
-# Quantum / QAOA — NOT required in Phase 0
+# Quantum / QAOA — Phase 5
 # ==============================================================================
-# Qiskit and related quantum packages will be introduced in a later phase.
-# Do NOT install them now to keep the environment lightweight.
+qiskit>=2.0
+qiskit-aer>=0.15

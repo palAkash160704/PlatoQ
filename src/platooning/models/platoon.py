@@ -32,8 +32,11 @@ class Platoon:
     platoon_id: str
     vehicle_ids: list[str] = field(default_factory=list)
     leader_id: str = ""
-    destination: str = ""
-    target_speed: float = 0.0
+    route_id: str = ""
+    lane_id: str = ""
+    formation_time: float = 0.0
+    target_speed_mps: float = 0.0
+    status: str = "FORMED"
 
     # ------------------------------------------------------------------
     # Convenience helpers
