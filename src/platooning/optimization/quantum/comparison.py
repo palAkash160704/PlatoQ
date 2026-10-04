@@ -368,7 +368,8 @@ def compare_all(
             "energy_gap": energy_gap,
             "feasible": qaoa_res.feasible,
             "runtime_ratio": (
-                qaoa_res.runtime_seconds / max(comparison.exact_qubo.runtime_seconds, 1e-10)
+                qaoa_res.runtime_seconds
+                / max(comparison.exact_qubo.runtime_seconds, 1e-10)
             ),
         }
 

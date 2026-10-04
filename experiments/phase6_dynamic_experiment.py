@@ -1,4 +1,3 @@
-
 """
 Phase 6 Dynamic Experiment.
 
@@ -108,13 +107,21 @@ def scenario_c_speed_divergence() -> list[tuple[float, list[VehicleState]]]:
     """Scenario C: Vehicle 3 gradually increases speed difference."""
     seq = []
     # All close and same speed (diff = 0)
-    seq.append((0.0, make_states(0.0, 100.0, 95.0, 90.0, v1_s=30.0, v2_s=29.5, v3_s=29.0)))
+    seq.append(
+        (0.0, make_states(0.0, 100.0, 95.0, 90.0, v1_s=30.0, v2_s=29.5, v3_s=29.0))
+    )
     # V3 speed drops further (diff = 2 <= 3.0)
-    seq.append((1.0, make_states(1.0, 130.0, 124.5, 118.0, v1_s=30.0, v2_s=29.5, v3_s=28.0)))
+    seq.append(
+        (1.0, make_states(1.0, 130.0, 124.5, 118.0, v1_s=30.0, v2_s=29.5, v3_s=28.0))
+    )
     # V3 speed drops to 25m/s (diff = 5 > 3.0)
-    seq.append((2.0, make_states(2.0, 160.0, 154.0, 143.0, v1_s=30.0, v2_s=29.5, v3_s=25.0)))
+    seq.append(
+        (2.0, make_states(2.0, 160.0, 154.0, 143.0, v1_s=30.0, v2_s=29.5, v3_s=25.0))
+    )
     # V3 stays slow
-    seq.append((3.0, make_states(3.0, 190.0, 183.5, 168.0, v1_s=30.0, v2_s=29.5, v3_s=25.0)))
+    seq.append(
+        (3.0, make_states(3.0, 190.0, 183.5, 168.0, v1_s=30.0, v2_s=29.5, v3_s=25.0))
+    )
     return seq
 
 
@@ -122,31 +129,52 @@ def scenario_d_v2v_degradation() -> list[tuple[float, list[VehicleState]]]:
     """Scenario D: Communication state becomes stale."""
     seq = []
     # t=0: Normal
-    seq.append((0.0, [
-        VehicleState("V1", 0.0, 100.0, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 0.0, 95.0, 0.0, 30.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            0.0,
+            [
+                VehicleState("V1", 0.0, 100.0, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 0.0, 95.0, 0.0, 30.0, "r1", "l1"),
+            ],
+        )
+    )
     # t=1: Normal
-    seq.append((1.0, [
-        VehicleState("V1", 1.0, 130.0, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 1.0, 125.0, 0.0, 30.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            1.0,
+            [
+                VehicleState("V1", 1.0, 130.0, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 1.0, 125.0, 0.0, 30.0, "r1", "l1"),
+            ],
+        )
+    )
     # t=2: V2 drops packet, its timestamp is still 1.0
-    seq.append((2.0, [
-        VehicleState("V1", 2.0, 160.0, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 1.0, 125.0, 0.0, 30.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            2.0,
+            [
+                VehicleState("V1", 2.0, 160.0, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 1.0, 125.0, 0.0, 30.0, "r1", "l1"),
+            ],
+        )
+    )
     # t=3: V2 comes back
-    seq.append((3.0, [
-        VehicleState("V1", 3.0, 190.0, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 3.0, 185.0, 0.0, 30.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            3.0,
+            [
+                VehicleState("V1", 3.0, 190.0, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 3.0, 185.0, 0.0, 30.0, "r1", "l1"),
+            ],
+        )
+    )
     return seq
 
 
 def scenario_e_split() -> list[tuple[float, list[VehicleState]]]:
     """Scenario E: Platoon Split."""
     seq = []
+
     def ms(time, x1, x2, x3, x4):
         return [
             VehicleState("V1", time, x1, 0.0, 30.0, "r1", "l1"),
@@ -154,6 +182,7 @@ def scenario_e_split() -> list[tuple[float, list[VehicleState]]]:
             VehicleState("V3", time, x3, 0.0, 30.0, "r1", "l1"),
             VehicleState("V4", time, x4, 0.0, 30.0, "r1", "l1"),
         ]
+
     seq.append((0.0, ms(0.0, 100, 95, 90, 85)))
     seq.append((1.0, ms(1.0, 150, 145, 90, 85)))
     return seq
@@ -163,23 +192,38 @@ def scenario_f_join_leave() -> list[tuple[float, list[VehicleState]]]:
     """Scenario F: Join and Leave."""
     seq = []
     # V1, V2 together. V3 far ahead.
-    seq.append((0.0, [
-        VehicleState("V1", 0.0, 50, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 0.0, 45, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V3", 0.0, 200, 0.0, 20.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            0.0,
+            [
+                VehicleState("V1", 0.0, 50, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 0.0, 45, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V3", 0.0, 200, 0.0, 20.0, "r1", "l1"),
+            ],
+        )
+    )
     # V1, V2 catch up to V3 -> Join
-    seq.append((20.0, [
-        VehicleState("V1", 20.0, 150, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 20.0, 145, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V3", 20.0, 155, 0.0, 30.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            20.0,
+            [
+                VehicleState("V1", 20.0, 150, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 20.0, 145, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V3", 20.0, 155, 0.0, 30.0, "r1", "l1"),
+            ],
+        )
+    )
     # V2 changes route -> Leave
-    seq.append((21.0, [
-        VehicleState("V1", 21.0, 180, 0.0, 30.0, "r1", "l1"),
-        VehicleState("V2", 21.0, 175, 0.0, 30.0, "r2", "l1"), # different route
-        VehicleState("V3", 21.0, 185, 0.0, 30.0, "r1", "l1"),
-    ]))
+    seq.append(
+        (
+            21.0,
+            [
+                VehicleState("V1", 21.0, 180, 0.0, 30.0, "r1", "l1"),
+                VehicleState("V2", 21.0, 175, 0.0, 30.0, "r2", "l1"),  # different route
+                VehicleState("V3", 21.0, 185, 0.0, 30.0, "r1", "l1"),
+            ],
+        )
+    )
     return seq
 
 
@@ -192,7 +236,7 @@ def print_event(e: dict):
     print("-" * 60)
     print(f"Time:              {e['timestamp']:.1f} s")
     print(f"Trigger:           {e['trigger']}")
-    print(f"Severity:          HIGH")  # Simplified for display
+    print("Severity:          HIGH")  # Simplified for display
     print()
     print("Old configuration:")
     for pid, members in e["old_configuration"].items():
@@ -229,9 +273,7 @@ def run_scenario(
 
     for t, states in sequence:
         # Wrap states as if they came from V2V
-        latest_known = {
-            s.vehicle_id: {s.vehicle_id: s} for s in states
-        }
+        latest_known = {s.vehicle_id: {s.vehicle_id: s} for s in states}
         dm.update_vehicle_states(latest_known, t)
 
     metrics = dm.finalize_metrics(sequence[-1][0])

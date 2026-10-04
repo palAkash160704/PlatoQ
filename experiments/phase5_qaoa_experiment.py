@@ -43,16 +43,31 @@ def scenario_a_3vehicles() -> tuple[str, list[VehicleState], dict]:
     """Scenario A: 3 compatible vehicles close together."""
     states = [
         VehicleState(
-            vehicle_id="V1", timestamp=10.0, position_x=100.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V1",
+            timestamp=10.0,
+            position_x=100.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V2", timestamp=10.0, position_x=95.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V2",
+            timestamp=10.0,
+            position_x=95.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V3", timestamp=10.0, position_x=90.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V3",
+            timestamp=10.0,
+            position_x=90.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
     ]
     return "3_vehicle_compatible", states, _default_config()
@@ -62,9 +77,13 @@ def scenario_b_4vehicles() -> tuple[str, list[VehicleState], dict]:
     """Scenario B: 4 compatible vehicles."""
     states = [
         VehicleState(
-            vehicle_id=f"V{i}", timestamp=10.0,
-            position_x=100.0 - i * 8.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id=f"V{i}",
+            timestamp=10.0,
+            position_x=100.0 - i * 8.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         )
         for i in range(1, 5)
     ]
@@ -75,9 +94,13 @@ def scenario_c_5vehicles() -> tuple[str, list[VehicleState], dict]:
     """Scenario C: 5 compatible vehicles (baseline)."""
     states = [
         VehicleState(
-            vehicle_id=f"V{i}", timestamp=10.0,
-            position_x=100.0 - i * 6.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id=f"V{i}",
+            timestamp=10.0,
+            position_x=100.0 - i * 6.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         )
         for i in range(1, 6)
     ]
@@ -92,25 +115,50 @@ def scenario_d_5vehicles_two_platoons() -> tuple[str, list[VehicleState], dict]:
     states = [
         # Group 1: V1, V2
         VehicleState(
-            vehicle_id="V1", timestamp=10.0, position_x=100.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V1",
+            timestamp=10.0,
+            position_x=100.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V2", timestamp=10.0, position_x=90.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V2",
+            timestamp=10.0,
+            position_x=90.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         # Group 2: V3, V4, V5 (far from group 1)
         VehicleState(
-            vehicle_id="V3", timestamp=10.0, position_x=40.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V3",
+            timestamp=10.0,
+            position_x=40.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V4", timestamp=10.0, position_x=32.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V4",
+            timestamp=10.0,
+            position_x=32.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V5", timestamp=10.0, position_x=24.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V5",
+            timestamp=10.0,
+            position_x=24.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
     ]
     return "5_vehicle_two_platoons", states, config
@@ -120,24 +168,49 @@ def scenario_e_5vehicles_incompatible() -> tuple[str, list[VehicleState], dict]:
     """Scenario E: 5 vehicles with some incompatible (different routes)."""
     states = [
         VehicleState(
-            vehicle_id="V1", timestamp=10.0, position_x=100.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V1",
+            timestamp=10.0,
+            position_x=100.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V2", timestamp=10.0, position_x=94.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V2",
+            timestamp=10.0,
+            position_x=94.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V3", timestamp=10.0, position_x=88.0, position_y=0.0,
-            speed=30.0, route_id="r2", lane_id="l1",  # Different route
+            vehicle_id="V3",
+            timestamp=10.0,
+            position_x=88.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r2",
+            lane_id="l1",  # Different route
         ),
         VehicleState(
-            vehicle_id="V4", timestamp=10.0, position_x=82.0, position_y=0.0,
-            speed=30.0, route_id="r1", lane_id="l1",
+            vehicle_id="V4",
+            timestamp=10.0,
+            position_x=82.0,
+            position_y=0.0,
+            speed=30.0,
+            route_id="r1",
+            lane_id="l1",
         ),
         VehicleState(
-            vehicle_id="V5", timestamp=10.0, position_x=76.0, position_y=0.0,
-            speed=35.0, route_id="r1", lane_id="l2",  # Different lane
+            vehicle_id="V5",
+            timestamp=10.0,
+            position_x=76.0,
+            position_y=0.0,
+            speed=35.0,
+            route_id="r1",
+            lane_id="l2",  # Different lane
         ),
     ]
     return "5_vehicle_incompatible", states, _default_config()
@@ -250,6 +323,7 @@ def run_experiment():
         for counts_str, count in qaoa_result.counts.items():
             bits = [int(b) for b in reversed(counts_str)]
             from platooning.optimization.quantum.decoder import validate_solution
+
             val = validate_solution(bits, states, config, current_time)
             if val.feasible:
                 total_feasible += count
@@ -288,37 +362,48 @@ def run_experiment():
 
 def _print_comparison(comp: ComparisonResult):
     """Print a formatted comparison table."""
-    print(f"\n  {'Method':<20s} {'Objective':>10s} {'QUBO Energy':>12s} "
-          f"{'Platoons':>8s} {'Feasible':>8s} {'Runtime':>10s}")
+    print(
+        f"\n  {'Method':<20s} {'Objective':>10s} {'QUBO Energy':>12s} "
+        f"{'Platoons':>8s} {'Feasible':>8s} {'Runtime':>10s}"
+    )
     print(f"  {'-' * 70}")
 
     c = comp.classical
-    print(f"  {'Classical':<20s} {c.objective:>10.2f} {'N/A':>12s} "
-          f"{c.num_platoons:>8d} {'True':>8s} {c.runtime_seconds:>10.4f}s")
+    print(
+        f"  {'Classical':<20s} {c.objective:>10.2f} {'N/A':>12s} "
+        f"{c.num_platoons:>8d} {'True':>8s} {c.runtime_seconds:>10.4f}s"
+    )
 
     e = comp.exact_qubo
-    print(f"  {'Exact QUBO':<20s} {e.objective:>10.2f} {e.qubo_energy:>12.2f} "
-          f"{e.num_platoons:>8d} {str(e.feasible):>8s} {e.runtime_seconds:>10.4f}s")
+    print(
+        f"  {'Exact QUBO':<20s} {e.objective:>10.2f} {e.qubo_energy:>12.2f} "
+        f"{e.num_platoons:>8d} {str(e.feasible):>8s} {e.runtime_seconds:>10.4f}s"
+    )
 
     for p, q in sorted(comp.qaoa_results.items()):
         label = f"QAOA p={p}"
-        print(f"  {label:<20s} {q.objective:>10.2f} {q.qubo_energy:>12.2f} "
-              f"{q.num_platoons:>8d} {str(q.feasible):>8s} {q.runtime_seconds:>10.4f}s")
+        print(
+            f"  {label:<20s} {q.objective:>10.2f} {q.qubo_energy:>12.2f} "
+            f"{q.num_platoons:>8d} {str(q.feasible):>8s} {q.runtime_seconds:>10.4f}s"
+        )
 
     # Metrics
     if comp.metrics:
         print("\n  Derived Metrics:")
         for key, m in comp.metrics.items():
-            print(f"    {key}: obj_gap={m['objective_gap']:.2f}  "
-                  f"rel_gap={m['relative_objective_gap']:.4f}  "
-                  f"energy_gap={m['energy_gap']:.2f}  "
-                  f"feasible={m['feasible']}")
+            print(
+                f"    {key}: obj_gap={m['objective_gap']:.2f}  "
+                f"rel_gap={m['relative_objective_gap']:.4f}  "
+                f"energy_gap={m['energy_gap']:.2f}  "
+                f"feasible={m['feasible']}"
+            )
 
 
 def _generate_plots(all_results: list[dict], plots_dir: Path):
     """Generate comparison plots."""
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
     except ImportError:
@@ -337,7 +422,9 @@ def _generate_plots(all_results: list[dict], plots_dir: Path):
     width = 0.15
 
     bars = [
-        ax.bar([xi - 2 * width for xi in x], classical_obj, width, label="Classical Greedy"),
+        ax.bar(
+            [xi - 2 * width for xi in x], classical_obj, width, label="Classical Greedy"
+        ),
         ax.bar([xi - width for xi in x], exact_obj, width, label="Exact QUBO"),
     ]
 
@@ -347,7 +434,9 @@ def _generate_plots(all_results: list[dict], plots_dir: Path):
             q = r["qaoa"].get(f"p{p}", {})
             qaoa_obj.append(q.get("objective", 0.0))
         bars.append(
-            ax.bar([xi + p_idx * width for xi in x], qaoa_obj, width, label=f"QAOA p={p}")
+            ax.bar(
+                [xi + p_idx * width for xi in x], qaoa_obj, width, label=f"QAOA p={p}"
+            )
         )
 
     ax.set_xlabel("Scenario")
@@ -397,7 +486,9 @@ def _generate_plots(all_results: list[dict], plots_dir: Path):
 
     ax.set_xlabel("Scenario")
     ax.set_ylabel("Runtime (seconds)")
-    ax.set_title("Phase 5: Runtime Comparison\n(Includes classical optimiser + simulator overhead)")
+    ax.set_title(
+        "Phase 5: Runtime Comparison\n(Includes classical optimiser + simulator overhead)"
+    )
     ax.set_xticks(list(x))
     ax.set_xticklabels(scenarios, rotation=45, ha="right")
     ax.legend()

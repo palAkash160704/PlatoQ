@@ -172,9 +172,7 @@ class TestEnergyEquivalence:
 
         for bits in itertools.product([0, 1], repeat=2):
             bits_list = list(bits)
-            qubo_e, ising_e, match = verify_energy_equivalence(
-                q, ising, bits_list
-            )
+            qubo_e, ising_e, match = verify_energy_equivalence(q, ising, bits_list)
             assert match, f"Mismatch at {bits}: QUBO={qubo_e}, Ising={ising_e}"
 
     def test_real_qubo_all_bitstrings(self, config):
@@ -197,9 +195,7 @@ class TestEnergyEquivalence:
         sol, energy = solve_qubo_exact(q_matrix, num_vars)
 
         ising = qubo_to_ising(q_matrix, num_vars)
-        qubo_e, ising_e, match = verify_energy_equivalence(
-            q_matrix, ising, sol
-        )
+        qubo_e, ising_e, match = verify_energy_equivalence(q_matrix, ising, sol)
         assert match
 
 

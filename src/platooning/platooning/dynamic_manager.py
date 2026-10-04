@@ -65,9 +65,7 @@ class DynamicPlatoonManager:
         self._cooldown_s = (
             float(dyn_conf.get("reconfiguration_cooldown_ms", 2000)) / 1000.0
         )
-        self._min_improvement = float(
-            dyn_conf.get("minimum_improvement", 0.5)
-        )
+        self._min_improvement = float(dyn_conf.get("minimum_improvement", 0.5))
 
         # State
         self._platoons: dict[str, Platoon] = {}
@@ -164,9 +162,7 @@ class DynamicPlatoonManager:
         active_platoons = list(self._platoons.values())
 
         # 1. Monitor all platoons
-        health_reports = self._monitor.check_all(
-            active_platoons, states, current_time
-        )
+        health_reports = self._monitor.check_all(active_platoons, states, current_time)
 
         # 2. Check for invalid platoons
         invalid_reports = [h for h in health_reports if not h.valid]
@@ -199,8 +195,7 @@ class DynamicPlatoonManager:
 
         # 5a. Critical violations bypass cooldown
         critical_reports = [
-            h for h in invalid_reports
-            if h.severity == ViolationSeverity.CRITICAL
+            h for h in invalid_reports if h.severity == ViolationSeverity.CRITICAL
         ]
         if critical_reports:
             needs_reconfig = True
@@ -248,8 +243,9 @@ class DynamicPlatoonManager:
         Uses the configured optimiser to form the first set of platoons.
         """
         import time
+
         start_time = time.perf_counter()
-        
+
         new_platoons = self._run_optimizer(states, current_time)
         self._apply_configuration(
             new_platoons,
@@ -257,7 +253,7 @@ class DynamicPlatoonManager:
             current_time,
             ReconfigTrigger.PERIODIC_REOPTIMIZATION,
             is_initial=True,
-            start_time=start_time
+            start_time=start_time,
         )
 
     # ------------------------------------------------------------------
@@ -283,12 +279,9 @@ class DynamicPlatoonManager:
 
         # Old configuration snapshot
         old_config = {
-            p.platoon_id: list(p.vehicle_ids)
-            for p in self._platoons.values()
+            p.platoon_id: list(p.vehicle_ids) for p in self._platoons.values()
         }
-        old_objective = self._compute_objective(
-            list(self._platoons.values()), states
-        )
+        old_objective = self._compute_objective(list(self._platoons.values()), states)
 
         # Run optimiser
         new_platoons = self._run_optimizer(states, current_time)
@@ -336,12 +329,12 @@ class DynamicPlatoonManager:
         current_time: float,
     ) -> list[Platoon]:
         """Phase 4 exact QUBO solver."""
+        from platooning.optimization.quantum.decoder import validate_solution
         from platooning.optimization.qubo_builder import (
             build_qubo,
             decode_solution,
             solve_qubo_exact,
         )
-        from platooning.optimization.quantum.decoder import validate_solution
 
         q_matrix, num_vars = build_qubo(states, self._config, current_time)
         if num_vars == 0:
@@ -349,7 +342,7 @@ class DynamicPlatoonManager:
 
         sol, _energy = solve_qubo_exact(q_matrix, num_vars)
         platoons = decode_solution(sol, states, self._config)
-        
+
         # If the exact QUBO solution is forced into an infeasible state
         # (e.g., to minimize penalties when no valid configuration exists),
         # we must reject it.
@@ -359,7 +352,7 @@ class DynamicPlatoonManager:
                 "[RECONFIG] Exact QUBO returned infeasible solution, falling back to classical"
             )
             return form_platoons(states, self._config, current_time)
-            
+
         return platoons
 
     def _run_qaoa_optimizer(
@@ -426,24 +419,20 @@ class DynamicPlatoonManager:
         if start_time is not None:
             elapsed_ms = (time.perf_counter() - start_time) * 1000.0
 
-        new_config = {
-            p.platoon_id: list(p.vehicle_ids) for p in new_platoons
-        }
+        new_config = {p.platoon_id: list(p.vehicle_ids) for p in new_platoons}
         new_objective = self._compute_objective(new_platoons, states)
 
         if old_config is None:
             old_config = {}
 
         # Detect if configuration actually changed
-        old_sets = {
-            frozenset(members) for members in old_config.values()
-        }
-        new_sets = {
-            frozenset(p.vehicle_ids) for p in new_platoons
-        }
+        old_sets = {frozenset(members) for members in old_config.values()}
+        new_sets = {frozenset(p.vehicle_ids) for p in new_platoons}
         changed = old_sets != new_sets
-        
-        event_type, affected_vehicles, affected_platoons = self._classify_change(old_config, new_config)
+
+        event_type, affected_vehicles, affected_platoons = self._classify_change(
+            old_config, new_config
+        )
 
         critical_triggers = {
             ReconfigTrigger.COMMUNICATION_LOSS,
@@ -452,7 +441,7 @@ class DynamicPlatoonManager:
             ReconfigTrigger.STALE_STATE,
             ReconfigTrigger.SIZE_VIOLATION,
         }
-        
+
         severity = "CRITICAL" if trigger in critical_triggers else "NON-CRITICAL"
         improvement = new_objective - old_objective
         accepted = True
@@ -466,11 +455,11 @@ class DynamicPlatoonManager:
                     reason = f"Improvement {improvement:.2f} < Minimum {self._min_improvement:.2f}"
             else:
                 reason = "Bypassed hysteresis due to critical trigger"
-                
+
         if not changed and not is_initial:
             accepted = False
             reason = "No configuration change"
-            
+
         # ---------------------------------------------------------
         # Required Explicit Logging
         # ---------------------------------------------------------
@@ -478,24 +467,34 @@ class DynamicPlatoonManager:
         logger.info(f"Time                : {current_time:.1f}")
         logger.info(f"Trigger             : {trigger.value}")
         logger.info(f"Severity            : {severity}")
-        
-        old_str = " | ".join(f"{pid}=[{','.join(v)}]" for pid, v in old_config.items()) if old_config else "None"
-        new_str = " | ".join(f"{pid}=[{','.join(v)}]" for pid, v in new_config.items()) if new_config else "None"
-        
+
+        old_str = (
+            " | ".join(f"{pid}=[{','.join(v)}]" for pid, v in old_config.items())
+            if old_config
+            else "None"
+        )
+        new_str = (
+            " | ".join(f"{pid}=[{','.join(v)}]" for pid, v in new_config.items())
+            if new_config
+            else "None"
+        )
+
         logger.info(f"Old configuration   : {old_str}")
         logger.info(f"New configuration   : {new_str}")
-        
+
         opt_time = f"{elapsed_ms:.2f} ms" if start_time is not None else "N/A"
         if is_initial and self._optimizer_mode == "qaoa" and start_time is None:
             opt_time = "SKIPPED - INITIAL FORMATION"
-            
+
         logger.info(f"Optimizer           : {self._optimizer_mode}")
         logger.info(f"Objective Before    : {old_objective:.2f}")
         logger.info(f"Objective After     : {new_objective:.2f}")
         logger.info(f"Improvement         : {improvement:.2f}")
         logger.info(f"Minimum Improvement : {self._min_improvement:.2f}")
-        logger.info(f"Accepted/Rejected   : {'ACCEPTED' if accepted else 'REJECTED'} ({reason})")
-        logger.info(f"Feasibility         : True")
+        logger.info(
+            f"Accepted/Rejected   : {'ACCEPTED' if accepted else 'REJECTED'} ({reason})"
+        )
+        logger.info("Feasibility         : True")
         logger.info(f"Optimizer Runtime   : {opt_time}")
         logger.info(f"Event Type          : {event_type}")
         logger.info("=============================")
@@ -513,9 +512,7 @@ class DynamicPlatoonManager:
             renumbered_platoons.append(p)
 
         # Update new_config with renumbered IDs
-        new_config = {
-            p.platoon_id: list(p.vehicle_ids) for p in renumbered_platoons
-        }
+        new_config = {p.platoon_id: list(p.vehicle_ids) for p in renumbered_platoons}
 
         # Apply
         self._platoons = {p.platoon_id: p for p in renumbered_platoons}
@@ -586,9 +583,7 @@ class DynamicPlatoonManager:
             if old_p != new_p:
                 affected_vehicles.append(v)
 
-        affected_platoons = list(
-            set(old_config.keys()) | set(new_config.keys())
-        )
+        affected_platoons = list(set(old_config.keys()) | set(new_config.keys()))
 
         # Classify
         old_n = len(old_config)
@@ -624,9 +619,7 @@ class DynamicPlatoonManager:
         w_membership = float(self._plat_conf.get("weight_membership", 10.0))
         w_dist = float(self._plat_conf.get("weight_distance_penalty", 0.5))
         w_speed = float(self._plat_conf.get("weight_speed_penalty", 1.0))
-        w_ungrouped = float(
-            self._plat_conf.get("weight_ungrouped_penalty", 5.0)
-        )
+        w_ungrouped = float(self._plat_conf.get("weight_ungrouped_penalty", 5.0))
 
         state_dict = {s.vehicle_id: s for s in states}
         grouped = sum(p.size for p in platoons)
@@ -697,9 +690,7 @@ class DynamicPlatoonManager:
         """Record time-series snapshot for metrics."""
         n_platoons = len(self._platoons)
         self._platoon_count_history.append((current_time, n_platoons))
-        self._objective_history.append(
-            (current_time, self._last_objective)
-        )
+        self._objective_history.append((current_time, self._last_objective))
 
     def finalize_metrics(self, total_time: float) -> DynamicMetrics:
         """Compute final aggregated metrics after simulation ends.
@@ -721,15 +712,13 @@ class DynamicPlatoonManager:
             m.churn_rate = m.configuration_changes / total_time
 
         if self._platoon_count_history:
-            m.average_num_platoons = (
-                sum(c for _, c in self._platoon_count_history)
-                / len(self._platoon_count_history)
-            )
+            m.average_num_platoons = sum(
+                c for _, c in self._platoon_count_history
+            ) / len(self._platoon_count_history)
 
         if self._objective_history:
-            m.average_objective = (
-                sum(o for _, o in self._objective_history)
-                / len(self._objective_history)
+            m.average_objective = sum(o for _, o in self._objective_history) / len(
+                self._objective_history
             )
 
         # Average platoon size
@@ -738,9 +727,7 @@ class DynamicPlatoonManager:
             if c > 0:
                 sizes.append(c)
         if sizes:
-            total_members = sum(
-                p.size for p in self._platoons.values()
-            )
+            total_members = sum(p.size for p in self._platoons.values())
             if len(self._platoons) > 0:
                 m.average_platoon_size = total_members / len(self._platoons)
 
@@ -755,40 +742,28 @@ class DynamicPlatoonManager:
         current_time: float,
     ) -> None:
         """Log a reconfiguration event in the required format."""
-        logger.info(
-            "[PLATOON] t=%.1f RECONFIGURATION", current_time
-        )
-        logger.info(
-            "[RECONFIG] Trigger=%s", event.trigger.value
-        )
+        logger.info("[PLATOON] t=%.1f RECONFIGURATION", current_time)
+        logger.info("[RECONFIG] Trigger=%s", event.trigger.value)
         logger.info("[RECONFIG] Optimizer=%s", event.optimizer)
         logger.info("[RECONFIG] Type=%s", event.event_type)
 
         if event.old_configuration:
             logger.info("[RECONFIG] Old:")
             for pid, members in event.old_configuration.items():
-                logger.info(
-                    "[RECONFIG]   %s=[%s]", pid, ",".join(members)
-                )
+                logger.info("[RECONFIG]   %s=[%s]", pid, ",".join(members))
 
         logger.info("[RECONFIG] New:")
         for pid, members in event.new_configuration.items():
-            logger.info(
-                "[RECONFIG]   %s=[%s]", pid, ",".join(members)
-            )
+            logger.info("[RECONFIG]   %s=[%s]", pid, ",".join(members))
 
         if event.affected_vehicles:
             # Find ungrouped
             all_new = set()
             for members in event.new_configuration.values():
                 all_new.update(members)
-            ungrouped = [
-                v for v in event.affected_vehicles if v not in all_new
-            ]
+            ungrouped = [v for v in event.affected_vehicles if v not in all_new]
             if ungrouped:
-                logger.info(
-                    "[RECONFIG]   UNGROUPED=[%s]", ",".join(ungrouped)
-                )
+                logger.info("[RECONFIG]   UNGROUPED=[%s]", ",".join(ungrouped))
 
         logger.info(
             "[RECONFIG] Objective: old=%.1f  new=%.1f  improvement=%.1f",

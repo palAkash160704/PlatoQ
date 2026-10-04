@@ -47,9 +47,7 @@ class QuantumOptimizer(BaseOptimizer):
         self._optimizer = str(quantum_conf.get("optimizer", "COBYLA"))
         self._seed = int(quantum_conf.get("seed", 42))
 
-    def optimize(
-        self, vehicle_states: list[VehicleState], **kwargs: Any
-    ) -> Any:
+    def optimize(self, vehicle_states: list[VehicleState], **kwargs: Any) -> Any:
         """Run the hybrid quantum-classical optimisation pipeline.
 
         Parameters
@@ -123,9 +121,7 @@ class QuantumOptimizer(BaseOptimizer):
         return {
             "cost": solution.get("energy", float("inf")),
             "feasible": 1.0 if solution.get("feasible", False) else 0.0,
-            "constraint_violations": float(
-                solution.get("constraint_violations", 0)
-            ),
+            "constraint_violations": float(solution.get("constraint_violations", 0)),
             "num_platoons": float(len(solution.get("platoons", []))),
         }
 

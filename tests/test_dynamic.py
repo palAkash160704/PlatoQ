@@ -177,8 +177,13 @@ class TestMemberTooFar:
         states_t1 = make_states([("V1", 100.0), ("V2", 95.0)])
         states_t1.append(
             VehicleState(
-                vehicle_id="V3", timestamp=12.0, position_x=30.0,
-                position_y=0.0, speed=30.0, route_id="r1", lane_id="l1",
+                vehicle_id="V3",
+                timestamp=12.0,
+                position_x=30.0,
+                position_y=0.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
             )
         )
         changed = dm.update(states_t1, 12.0)
@@ -193,10 +198,22 @@ class TestSpeedMismatch:
         """Monitor detects speed difference exceeding threshold."""
         monitor = PlatoonMonitor(config)
         states = [
-            VehicleState(vehicle_id="V1", timestamp=10.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=10.0, position_x=95.0,
-                         speed=36.0, route_id="r1", lane_id="l1"),  # 6m/s diff > 3m/s
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=10.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=10.0,
+                position_x=95.0,
+                speed=36.0,
+                route_id="r1",
+                lane_id="l1",
+            ),  # 6m/s diff > 3m/s
         ]
         platoon = make_platoon("P1", ["V1", "V2"], "V1")
 
@@ -213,10 +230,22 @@ class TestStaleState:
         """Monitor detects stale vehicle state."""
         monitor = PlatoonMonitor(config)
         states = [
-            VehicleState(vehicle_id="V1", timestamp=10.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=8.0, position_x=95.0,  # 4s old
-                         speed=30.0, route_id="r1", lane_id="l1"),
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=10.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=8.0,
+                position_x=95.0,  # 4s old
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
         ]
         platoon = make_platoon("P1", ["V1", "V2"], "V1")
 
@@ -234,8 +263,14 @@ class TestCommunicationLoss:
         monitor = PlatoonMonitor(config)
         # Only V1 has state data; V2 is missing
         states = [
-            VehicleState(vehicle_id="V1", timestamp=10.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=10.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
         ]
         platoon = make_platoon("P1", ["V1", "V2"], "V1")
         state_map = {s.vehicle_id: s for s in states}
@@ -257,9 +292,7 @@ class TestVehicleJoining:
         states = make_states([("V1", 100.0), ("V2", 95.0), ("V3", 92.0)])
         platoon = make_platoon("P1", ["V1", "V2"], "V1")
 
-        candidates = monitor.detect_new_compatible_vehicles(
-            [platoon], states, 10.1
-        )
+        candidates = monitor.detect_new_compatible_vehicles([platoon], states, 10.1)
         # V3 should be a candidate to join P1
         assert len(candidates) > 0
         assert any(v == "V3" for v, _ in candidates)
@@ -273,8 +306,9 @@ class TestVehicleJoining:
         dm.initial_formation(states_t0, 10.0)
 
         # V3 appears nearby
-        states_t1 = make_states([("V1", 100.0), ("V2", 95.0), ("V3", 92.0)],
-                                timestamp=12.0)
+        states_t1 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 92.0)], timestamp=12.0
+        )
         changed = dm.update(states_t1, 12.0)
         assert changed is True
 
@@ -301,12 +335,30 @@ class TestVehicleLeaving:
 
         # V3 moves to different route
         states_t1 = [
-            VehicleState(vehicle_id="V1", timestamp=12.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=12.0, position_x=95.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V3", timestamp=12.0, position_x=90.0,
-                         speed=30.0, route_id="r2", lane_id="l1"),
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=12.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=12.0,
+                position_x=95.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V3",
+                timestamp=12.0,
+                position_x=90.0,
+                speed=30.0,
+                route_id="r2",
+                lane_id="l1",
+            ),
         ]
         changed = dm.update(states_t1, 12.0)
         assert changed is True
@@ -328,21 +380,45 @@ class TestPlatoonSplitting:
         dm = DynamicPlatoonManager(config, optimizer_mode="classical")
 
         # Initially all close
-        states_t0 = make_states([
-            ("V1", 100.0), ("V2", 95.0), ("V3", 90.0), ("V4", 85.0)
-        ])
+        states_t0 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 90.0), ("V4", 85.0)]
+        )
         dm.initial_formation(states_t0, 10.0)
 
         # Split into two groups
         states_t1 = [
-            VehicleState(vehicle_id="V1", timestamp=12.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=12.0, position_x=95.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V3", timestamp=12.0, position_x=60.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V4", timestamp=12.0, position_x=55.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=12.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=12.0,
+                position_x=95.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V3",
+                timestamp=12.0,
+                position_x=60.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V4",
+                timestamp=12.0,
+                position_x=55.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
         ]
         changed = dm.update(states_t1, 12.0)
         assert changed is True
@@ -361,14 +437,38 @@ class TestPlatoonMerging:
 
         # Two separate groups
         states_t0 = [
-            VehicleState(vehicle_id="V1", timestamp=10.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=10.0, position_x=95.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V3", timestamp=10.0, position_x=60.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V4", timestamp=10.0, position_x=55.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=10.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=10.0,
+                position_x=95.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V3",
+                timestamp=10.0,
+                position_x=60.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V4",
+                timestamp=10.0,
+                position_x=55.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
         ]
         dm.initial_formation(states_t0, 10.0)
         assert len(dm.platoons) == 2
@@ -380,9 +480,9 @@ class TestPlatoonMerging:
         dm._min_improvement = -100.0  # Apply directly to the instance
         dm._monitor = PlatoonMonitor(config)
 
-        states_t1 = make_states([
-            ("V1", 100.0), ("V2", 95.0), ("V3", 90.0), ("V4", 85.0)
-        ], timestamp=15.0)
+        states_t1 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 90.0), ("V4", 85.0)], timestamp=15.0
+        )
         changed = dm.update(states_t1, 15.0)
         assert changed is True
         assert len(dm.platoons) == 1
@@ -414,8 +514,9 @@ class TestCooldown:
         dm.initial_formation(states_t0, 10.0)
 
         # Add V3 at t=12 (2s later, beyond 1s cooldown)
-        states_t1 = make_states([("V1", 100.0), ("V2", 95.0), ("V3", 90.0)],
-                                timestamp=12.0)
+        states_t1 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 90.0)], timestamp=12.0
+        )
         changed = dm.update(states_t1, 12.0)
         assert changed is True
 
@@ -449,10 +550,22 @@ class TestConfigValidation:
         """Monitor validates route consistency within a platoon."""
         monitor = PlatoonMonitor(config)
         states = [
-            VehicleState(vehicle_id="V1", timestamp=10.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=10.0, position_x=95.0,
-                         speed=30.0, route_id="r2", lane_id="l1"),  # diff route
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=10.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=10.0,
+                position_x=95.0,
+                speed=30.0,
+                route_id="r2",
+                lane_id="l1",
+            ),  # diff route
         ]
         platoon = make_platoon("P1", ["V1", "V2"], "V1")
 
@@ -464,10 +577,22 @@ class TestConfigValidation:
         """Monitor validates lane consistency within a platoon."""
         monitor = PlatoonMonitor(config)
         states = [
-            VehicleState(vehicle_id="V1", timestamp=10.0, position_x=100.0,
-                         speed=30.0, route_id="r1", lane_id="l1"),
-            VehicleState(vehicle_id="V2", timestamp=10.0, position_x=95.0,
-                         speed=30.0, route_id="r1", lane_id="l2"),  # diff lane
+            VehicleState(
+                vehicle_id="V1",
+                timestamp=10.0,
+                position_x=100.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            ),
+            VehicleState(
+                vehicle_id="V2",
+                timestamp=10.0,
+                position_x=95.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l2",
+            ),  # diff lane
         ]
         platoon = make_platoon("P1", ["V1", "V2"], "V1")
 
@@ -550,8 +675,14 @@ class TestObjectiveCalculation:
         # Force a change
         states_t1 = make_states([("V1", 100.0), ("V2", 95.0)], timestamp=12.0)
         states_t1.append(
-            VehicleState(vehicle_id="V3", timestamp=12.0, position_x=30.0,
-                         speed=30.0, route_id="r2", lane_id="l1")
+            VehicleState(
+                vehicle_id="V3",
+                timestamp=12.0,
+                position_x=30.0,
+                speed=30.0,
+                route_id="r2",
+                lane_id="l1",
+            )
         )
         dm.update(states_t1, 12.0)
 
@@ -583,8 +714,9 @@ class TestReconfigLatency:
         states_t0 = make_states([("V1", 100.0), ("V2", 95.0)])
         dm.initial_formation(states_t0, 10.0)
 
-        states_t1 = make_states([("V1", 100.0), ("V2", 95.0), ("V3", 90.0)],
-                                timestamp=12.0)
+        states_t1 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 90.0)], timestamp=12.0
+        )
         dm.update(states_t1, 12.0)
 
         metrics = dm.finalize_metrics(12.0)
@@ -608,14 +740,21 @@ class TestClassicalDynamic:
         # Phase 2: V3 separates
         states_t1 = make_states([("V1", 100.0), ("V2", 95.0)])
         states_t1.append(
-            VehicleState(vehicle_id="V3", timestamp=12.0, position_x=30.0,
-                         speed=30.0, route_id="r1", lane_id="l1")
+            VehicleState(
+                vehicle_id="V3",
+                timestamp=12.0,
+                position_x=30.0,
+                speed=30.0,
+                route_id="r1",
+                lane_id="l1",
+            )
         )
         dm.update(states_t1, 12.0)
 
         # Phase 3: V3 rejoins
-        states_t2 = make_states([("V1", 100.0), ("V2", 95.0), ("V3", 92.0)],
-                                timestamp=14.0)
+        states_t2 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 92.0)], timestamp=14.0
+        )
         dm.update(states_t2, 14.0)
 
         metrics = dm.finalize_metrics(14.0)
@@ -644,8 +783,9 @@ class TestExactQUBODynamic:
         states_t0 = make_states([("V1", 100.0), ("V2", 95.0)])
         dm.initial_formation(states_t0, 10.0)
 
-        states_t1 = make_states([("V1", 100.0), ("V2", 95.0), ("V3", 90.0)],
-                                timestamp=12.0)
+        states_t1 = make_states(
+            [("V1", 100.0), ("V2", 95.0), ("V3", 90.0)], timestamp=12.0
+        )
         changed = dm.update(states_t1, 12.0)
         assert changed is True
 

@@ -403,19 +403,21 @@ def analyze_samples(
         # Validate
         validation = validate_solution(bits, states, config, current_time)
 
-        analyses.append({
-            "bitstring": bitstr,
-            "bits": bits,
-            "count": count,
-            "frequency": count / total_shots,
-            "energy": energy,
-            "feasible": validation.feasible,
-            "violation_count": validation.violation_count,
-            "violations": validation.violations,
-            "num_platoons": len(decoded.platoons),
-            "platoon_sizes": [p.size for p in decoded.platoons],
-            "ungrouped_count": len(decoded.ungrouped),
-        })
+        analyses.append(
+            {
+                "bitstring": bitstr,
+                "bits": bits,
+                "count": count,
+                "frequency": count / total_shots,
+                "energy": energy,
+                "feasible": validation.feasible,
+                "violation_count": validation.violation_count,
+                "violations": validation.violations,
+                "num_platoons": len(decoded.platoons),
+                "platoon_sizes": [p.size for p in decoded.platoons],
+                "ungrouped_count": len(decoded.ungrouped),
+            }
+        )
 
     return analyses
 
@@ -456,10 +458,10 @@ def select_best_feasible(
     for bitstr in counts:
         # 1. Parse raw bitstring
         raw_bits = [int(b) for b in reversed(bitstr)]
-        
+
         # 2. Repair slack variables to match physical assignment
         repaired_bits = list(raw_bits)
-        
+
         # Count physical size of each platoon i
         platoon_sizes: dict[int, int] = {i: 0 for i in range(n_veh)}
         for i in range(n_veh):
@@ -469,14 +471,14 @@ def select_best_feasible(
                     idx = x_indices[key]
                     if idx < len(raw_bits) and raw_bits[idx] == 1:
                         platoon_sizes[i] += 1
-                        
+
         # Enforce exactly the correct slack variable
         for i, size in platoon_sizes.items():
             # Zero out all slack variables for platoon i
-            for (i_idx, v), s_idx in s_indices.items():
+            for (i_idx, _v), s_idx in s_indices.items():
                 if i_idx == i and s_idx < len(repaired_bits):
                     repaired_bits[s_idx] = 0
-            
+
             # Set the correct slack variable if it exists
             if size > 0:
                 key = (i, size)

@@ -3,6 +3,7 @@ Tests for Phase 4 QUBO formulation.
 """
 
 import math
+
 import pytest
 
 from platooning.models.vehicle import VehicleState
@@ -272,22 +273,22 @@ def test_phase3_cross_validation(config):
 def test_qubo_distance_compatibility_50m(config):
     """TEST 17: Compatibility distance regression test."""
     config["platooning"]["max_formation_distance_m"] = 50.0
-    
+
     # Vehicles at 100m distance -> should be incompatible
     states_100 = create_states(2)
     states_100[0].position_x = 100.0
-    states_100[1].position_x = 0.0 # diff is 100
-    
+    states_100[1].position_x = 0.0  # diff is 100
+
     q_matrix, n = build_qubo(states_100, config, 10.1)
     sol, _ = solve_qubo_exact(q_matrix, n)
     platoons = decode_solution(sol, states_100, config)
     assert len(platoons) == 0
-    
+
     # Vehicles at 40m distance -> should be compatible
     states_40 = create_states(2)
     states_40[0].position_x = 100.0
-    states_40[1].position_x = 60.0 # diff is 40
-    
+    states_40[1].position_x = 60.0  # diff is 40
+
     q_matrix, n = build_qubo(states_40, config, 10.1)
     sol, _ = solve_qubo_exact(q_matrix, n)
     platoons = decode_solution(sol, states_40, config)

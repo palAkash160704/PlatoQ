@@ -111,9 +111,7 @@ class PlatoonMonitor:
         health.severity = ViolationSeverity.LOW
 
         max_dist = float(self._plat_conf.get("max_formation_distance_m", 50.0))
-        max_speed_diff = float(
-            self._plat_conf.get("max_speed_difference_mps", 3.0)
-        )
+        max_speed_diff = float(self._plat_conf.get("max_speed_difference_mps", 3.0))
         min_size = int(self._plat_conf.get("minimum_platoon_size", 2))
         max_size = int(self._plat_conf.get("maximum_platoon_size", 5))
         stale_thresh_s = (
@@ -178,7 +176,8 @@ class PlatoonMonitor:
                         if v.vehicle_id not in health.affected_members:
                             health.affected_members.append(v.vehicle_id)
                     health.severity = max(
-                        health.severity, ViolationSeverity.CRITICAL,
+                        health.severity,
+                        ViolationSeverity.CRITICAL,
                         key=lambda s: list(ViolationSeverity).index(s),
                     )
 
@@ -195,7 +194,8 @@ class PlatoonMonitor:
                         if v.vehicle_id not in health.affected_members:
                             health.affected_members.append(v.vehicle_id)
                     health.severity = max(
-                        health.severity, ViolationSeverity.HIGH,
+                        health.severity,
+                        ViolationSeverity.HIGH,
                         key=lambda s: list(ViolationSeverity).index(s),
                     )
 
@@ -216,7 +216,8 @@ class PlatoonMonitor:
                         if v.vehicle_id not in health.affected_members:
                             health.affected_members.append(v.vehicle_id)
                     health.severity = max(
-                        health.severity, ViolationSeverity.MEDIUM,
+                        health.severity,
+                        ViolationSeverity.MEDIUM,
                         key=lambda s: list(ViolationSeverity).index(s),
                     )
 
@@ -234,7 +235,8 @@ class PlatoonMonitor:
                         if v.vehicle_id not in health.affected_members:
                             health.affected_members.append(v.vehicle_id)
                     health.severity = max(
-                        health.severity, ViolationSeverity.MEDIUM,
+                        health.severity,
+                        ViolationSeverity.MEDIUM,
                         key=lambda s: list(ViolationSeverity).index(s),
                     )
 
@@ -246,11 +248,10 @@ class PlatoonMonitor:
             health.valid = False
             if ReconfigTrigger.SIZE_VIOLATION not in health.violations:
                 health.violations.append(ReconfigTrigger.SIZE_VIOLATION)
-            health.violation_details.append(
-                f"Size {effective_size} < min {min_size}"
-            )
+            health.violation_details.append(f"Size {effective_size} < min {min_size}")
             health.severity = max(
-                health.severity, ViolationSeverity.HIGH,
+                health.severity,
+                ViolationSeverity.HIGH,
                 key=lambda s: list(ViolationSeverity).index(s),
             )
 
@@ -261,11 +262,10 @@ class PlatoonMonitor:
             health.valid = False
             if ReconfigTrigger.SIZE_VIOLATION not in health.violations:
                 health.violations.append(ReconfigTrigger.SIZE_VIOLATION)
-            health.violation_details.append(
-                f"Size {effective_size} > max {max_size}"
-            )
+            health.violation_details.append(f"Size {effective_size} > max {max_size}")
             health.severity = max(
-                health.severity, ViolationSeverity.MEDIUM,
+                health.severity,
+                ViolationSeverity.MEDIUM,
                 key=lambda s: list(ViolationSeverity).index(s),
             )
 

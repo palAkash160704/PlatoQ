@@ -35,12 +35,13 @@ class QUBOOptimizer(BaseOptimizer):
 
     def optimize(self, vehicle_states: list[VehicleState], **kwargs: Any) -> Any:
         """Formulate and solve the QUBO using the exact solver."""
+        import time
+
         from platooning.optimization.qubo_builder import (
             build_qubo,
+            decode_solution,
             solve_qubo_exact,
-            decode_solution
         )
-        import time
 
         q_matrix, num_vars = build_qubo(vehicle_states, self._config, time.time())
         if num_vars == 0:

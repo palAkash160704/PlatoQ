@@ -337,9 +337,7 @@ class QAOASolver:
             angle = 2.0 * gamma * hi
             qc.rz(angle, i)
 
-    def _apply_mixer_unitary(
-        self, qc: QuantumCircuit, n: int, beta: float
-    ) -> None:
+    def _apply_mixer_unitary(self, qc: QuantumCircuit, n: int, beta: float) -> None:
         """Apply the X-mixer unitary exp(-i β Σ X_i).
 
         Each qubit gets Rx(2β).
